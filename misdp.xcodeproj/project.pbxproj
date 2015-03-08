@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11DA08771AACFF05002DCA4B /* MisdpSolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11F66CD91AACED9200A928FB /* MisdpSolver.cpp */; };
+		11DA08791AACFF05002DCA4B /* MisdpModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11F66CDB1AACED9200A928FB /* MisdpModel.cpp */; };
+		11DA087B1AACFF05002DCA4B /* MisdpTuneParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11F66CDF1AACED9200A928FB /* MisdpTuneParameters.cpp */; };
+		11DA087F1AAD0136002DCA4B /* Rectangle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11DA087D1AAD0136002DCA4B /* Rectangle.cpp */; };
 		11F66CD21AACE43400A928FB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11F66CD11AACE43400A928FB /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -23,8 +27,18 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		11DA087D1AAD0136002DCA4B /* Rectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rectangle.cpp; sourceTree = "<group>"; };
+		11DA087E1AAD0136002DCA4B /* Rectangle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rectangle.h; sourceTree = "<group>"; };
 		11F66CCE1AACE43400A928FB /* misdp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = misdp; sourceTree = BUILT_PRODUCTS_DIR; };
 		11F66CD11AACE43400A928FB /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		11F66CD81AACED9200A928FB /* MisdpSolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MisdpSolver.h; sourceTree = "<group>"; };
+		11F66CD91AACED9200A928FB /* MisdpSolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MisdpSolver.cpp; sourceTree = "<group>"; };
+		11F66CDA1AACED9200A928FB /* MisdpTuneParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MisdpTuneParameters.h; sourceTree = "<group>"; };
+		11F66CDB1AACED9200A928FB /* MisdpModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MisdpModel.cpp; sourceTree = "<group>"; };
+		11F66CDC1AACED9200A928FB /* MisdpModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MisdpModel.h; sourceTree = "<group>"; };
+		11F66CDE1AACED9200A928FB /* data.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = data.txt; sourceTree = "<group>"; };
+		11F66CDF1AACED9200A928FB /* MisdpTuneParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MisdpTuneParameters.cpp; sourceTree = "<group>"; };
+		11F66CE31AACEF5D00A928FB /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +71,27 @@
 		11F66CD01AACE43400A928FB /* misdp */ = {
 			isa = PBXGroup;
 			children = (
+				11F66CE31AACEF5D00A928FB /* main.h */,
 				11F66CD11AACE43400A928FB /* main.cpp */,
+				11DA087D1AAD0136002DCA4B /* Rectangle.cpp */,
+				11DA087E1AAD0136002DCA4B /* Rectangle.h */,
+				11F66CD91AACED9200A928FB /* MisdpSolver.cpp */,
+				11F66CD81AACED9200A928FB /* MisdpSolver.h */,
+				11F66CDB1AACED9200A928FB /* MisdpModel.cpp */,
+				11F66CDC1AACED9200A928FB /* MisdpModel.h */,
+				11F66CDF1AACED9200A928FB /* MisdpTuneParameters.cpp */,
+				11F66CDA1AACED9200A928FB /* MisdpTuneParameters.h */,
+				11F66CDD1AACED9200A928FB /* data */,
 			);
 			path = misdp;
+			sourceTree = "<group>";
+		};
+		11F66CDD1AACED9200A928FB /* data */ = {
+			isa = PBXGroup;
+			children = (
+				11F66CDE1AACED9200A928FB /* data.txt */,
+			);
+			path = data;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,6 +150,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11DA08771AACFF05002DCA4B /* MisdpSolver.cpp in Sources */,
+				11DA08791AACFF05002DCA4B /* MisdpModel.cpp in Sources */,
+				11DA087B1AACFF05002DCA4B /* MisdpTuneParameters.cpp in Sources */,
+				11DA087F1AAD0136002DCA4B /* Rectangle.cpp in Sources */,
 				11F66CD21AACE43400A928FB /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -129,18 +165,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -163,9 +187,9 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/cplex/include\n/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/concert/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-std=c++11",
@@ -182,8 +206,15 @@
 					"-DIL_STD",
 					"-I/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/cplex/include",
 					"-I/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/concert/include",
+					"-L/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/cplex/lib/x86-64_osx/static_pic",
+					"-L/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/concert/lib/x86-64_osx/static_pic",
+					"-lconcert",
+					"-lilocplex",
+					"-lcplex",
+					"-lm",
+					"-pthread",
 				);
-				SDKROOT = macosx;
+				SDKROOT = "";
 			};
 			name = Debug;
 		};
@@ -191,18 +222,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -220,9 +239,9 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/cplex/include\n/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/concert/include",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-std=c++11",
@@ -239,8 +258,15 @@
 					"-DIL_STD",
 					"-I/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/cplex/include",
 					"-I/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/concert/include",
+					"-L/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/cplex/lib/x86-64_osx/static_pic",
+					"-L/Users/Qi/Applications/IBM/ILOG/CPLEX_Studio1261/concert/lib/x86-64_osx/static_pic",
+					"-lconcert",
+					"-lilocplex",
+					"-lcplex",
+					"-lm",
+					"-pthread",
 				);
-				SDKROOT = macosx;
+				SDKROOT = "";
 			};
 			name = Release;
 		};
@@ -268,7 +294,7 @@
 				11F66CD41AACE43400A928FB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		11F66CD51AACE43400A928FB /* Build configuration list for PBXNativeTarget "misdp" */ = {
 			isa = XCConfigurationList;
@@ -277,6 +303,7 @@
 				11F66CD71AACE43400A928FB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
