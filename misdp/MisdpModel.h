@@ -29,8 +29,8 @@
 using namespace std;
 
 class Expression{
-    vector<double> coefficients;
 public:
+    vector<double> coefficients;
 //    Expression(vector<double>);
 //    Expression( );
     void setCoefficients(const vector<double> &);
@@ -38,9 +38,10 @@ public:
 
 
 class Constraint : public Expression {
+public:
     double rhs;
     char sign; // 'g', 'l', 'e' ~ greater, less, equal to
-public:
+
 //    Constraint();
 //    Constraint(vector<double>, char sign = 'g', double rhs = 0);
     void setRhs(double);
@@ -49,22 +50,25 @@ public:
 
 
 class Objective : public Expression {
-    string sense = "min";
 public:
+    string sense = "min";
+
     Objective();
     Objective(vector<double>, string sense = "min");
 };
 
 
 class MisdpModel{
+
+
+public:
     Objective obj;
     vector<Constraint> cons;
     int m;
     int n;
-
-public:
+    
     MisdpModel();
-    void readdata(string filename="/Users/Qi/Dropbox/research/my work/MISDP-solver/misdp/src/data/data.txt");
+    void readdata(string filename="/Users/Qi/Dropbox/research/mywork/MISDP-solver/misdp/misdp/data/data.txt");
 
 };
 

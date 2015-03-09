@@ -28,9 +28,11 @@ void MisdpModel :: readdata( string filename )
         string first;
         iss >> first;
         if (! (first == "obj")) {
+            cout << "iss = "  << endl;
+            cout << "iss = " << iss.str() << endl;
             cout << "Error data file. First = " << first << "\n";
-            cout << "filename = " << filename;
-            cout << "some action needed ! (tag f09q2jf0q238) ";
+            cout << "filename = " << filename << endl;
+            cout << "some action needed ! (tag q34f3w5g46) ";
             int temp;
             cin >> temp;
         }
@@ -86,6 +88,31 @@ void MisdpModel :: readdata( string filename )
     }
     
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

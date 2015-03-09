@@ -14,7 +14,12 @@
 
 class MisdpTuneParameters{
     bool if_true;
+    
+    
 public:
+    
+    double rootBestValue;
+
     MisdpTuneParameters();
     
 };

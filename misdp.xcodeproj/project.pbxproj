@@ -27,6 +27,28 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		11572B0F1AAD0E1B004495DA /* DataModel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DataModel.cpp; sourceTree = "<group>"; };
+		11572B101AAD0E1B004495DA /* DataModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataModel.h; sourceTree = "<group>"; };
+		11572B111AAD0E1B004495DA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		11572B121AAD0E1B004495DA /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		11572B131AAD0E1B004495DA /* Qi_Algorithm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Qi_Algorithm.cpp; sourceTree = "<group>"; };
+		11572B141AAD0E1B004495DA /* Qi_Algorithm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Qi_Algorithm.h; sourceTree = "<group>"; };
+		11572B151AAD0E1B004495DA /* Qi_IO.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Qi_IO.cpp; sourceTree = "<group>"; };
+		11572B161AAD0E1B004495DA /* Qi_IO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Qi_IO.h; sourceTree = "<group>"; };
+		11572B171AAD0E1B004495DA /* Qi_Math.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Qi_Math.cpp; sourceTree = "<group>"; };
+		11572B181AAD0E1B004495DA /* Qi_Math.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Qi_Math.h; sourceTree = "<group>"; };
+		11572B191AAD0E1B004495DA /* Qi_Stat.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Qi_Stat.cpp; sourceTree = "<group>"; };
+		11572B1A1AAD0E1B004495DA /* Qi_Stat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Qi_Stat.h; sourceTree = "<group>"; };
+		11572B1B1AAD0E1B004495DA /* SparseRegressionProblem.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SparseRegressionProblem.cpp; sourceTree = "<group>"; };
+		11572B1C1AAD0E1B004495DA /* SparseRegressionProblem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SparseRegressionProblem.h; sourceTree = "<group>"; };
+		11572B1D1AAD0E1B004495DA /* SparseRegressionProblem_backup.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SparseRegressionProblem_backup.cpp; sourceTree = "<group>"; };
+		11572B1E1AAD0E1B004495DA /* SparseRegressionProblem_backup201411020244pm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SparseRegressionProblem_backup201411020244pm.cpp; sourceTree = "<group>"; };
+		11572B1F1AAD0E1B004495DA /* SparseRegressionProblem_backup201411021046pm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SparseRegressionProblem_backup201411021046pm.cpp; sourceTree = "<group>"; };
+		11572B201AAD0E1B004495DA /* SparseRegressionProblem_backup201412030142am.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SparseRegressionProblem_backup201412030142am.cpp; sourceTree = "<group>"; };
+		11572B211AAD0E1B004495DA /* SystemParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemParameters.h; sourceTree = "<group>"; };
+		11572B221AAD0E1B004495DA /* test_dgetrf.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_dgetrf.cpp; sourceTree = "<group>"; };
+		11572B231AAD0E1B004495DA /* TuneParameters.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TuneParameters.cpp; sourceTree = "<group>"; };
+		11572B241AAD0E1B004495DA /* TuneParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TuneParameters.h; sourceTree = "<group>"; };
 		11DA087D1AAD0136002DCA4B /* Rectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rectangle.cpp; sourceTree = "<group>"; };
 		11DA087E1AAD0136002DCA4B /* Rectangle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rectangle.h; sourceTree = "<group>"; };
 		11F66CCE1AACE43400A928FB /* misdp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = misdp; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,9 +74,39 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		11572B0E1AAD0E1B004495DA /* old_code */ = {
+			isa = PBXGroup;
+			children = (
+				11572B0F1AAD0E1B004495DA /* DataModel.cpp */,
+				11572B101AAD0E1B004495DA /* DataModel.h */,
+				11572B111AAD0E1B004495DA /* main.cpp */,
+				11572B121AAD0E1B004495DA /* main.h */,
+				11572B131AAD0E1B004495DA /* Qi_Algorithm.cpp */,
+				11572B141AAD0E1B004495DA /* Qi_Algorithm.h */,
+				11572B151AAD0E1B004495DA /* Qi_IO.cpp */,
+				11572B161AAD0E1B004495DA /* Qi_IO.h */,
+				11572B171AAD0E1B004495DA /* Qi_Math.cpp */,
+				11572B181AAD0E1B004495DA /* Qi_Math.h */,
+				11572B191AAD0E1B004495DA /* Qi_Stat.cpp */,
+				11572B1A1AAD0E1B004495DA /* Qi_Stat.h */,
+				11572B1B1AAD0E1B004495DA /* SparseRegressionProblem.cpp */,
+				11572B1C1AAD0E1B004495DA /* SparseRegressionProblem.h */,
+				11572B1D1AAD0E1B004495DA /* SparseRegressionProblem_backup.cpp */,
+				11572B1E1AAD0E1B004495DA /* SparseRegressionProblem_backup201411020244pm.cpp */,
+				11572B1F1AAD0E1B004495DA /* SparseRegressionProblem_backup201411021046pm.cpp */,
+				11572B201AAD0E1B004495DA /* SparseRegressionProblem_backup201412030142am.cpp */,
+				11572B211AAD0E1B004495DA /* SystemParameters.h */,
+				11572B221AAD0E1B004495DA /* test_dgetrf.cpp */,
+				11572B231AAD0E1B004495DA /* TuneParameters.cpp */,
+				11572B241AAD0E1B004495DA /* TuneParameters.h */,
+			);
+			path = old_code;
+			sourceTree = "<group>";
+		};
 		11F66CC51AACE43400A928FB = {
 			isa = PBXGroup;
 			children = (
+				11572B0E1AAD0E1B004495DA /* old_code */,
 				11F66CD01AACE43400A928FB /* misdp */,
 				11F66CCF1AACE43400A928FB /* Products */,
 			);
