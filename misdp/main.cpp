@@ -19,7 +19,8 @@ int main(int argc, const char * argv[])
     
     
 //    Rectangle rect (3,4);
-//    Rectangle rectb;
+    Rectangle rectb;
+    rectb.test_LAPACK();
 //    cout << "rect area: " << rect.area() << endl;
 //    cout << "rectb area: " << rectb.area() << endl;
 //    return 0;

@@ -41,15 +41,16 @@ public:
     MisdpSolver();
     
     void solve();
-    
-    void build(IloModel &model, IloBoolVarArray &x);
-    void build_obj(IloModel &model, IloBoolVarArray &x);
-    void build_initCons(IloModel &model, IloBoolVarArray &x);
+    void namingVar(IloModel &model, IloNumVarArray &x);
+    void build(IloModel &model, IloNumVarArray &x, IloBoolVar &tempBoolVar);
+    void build_obj(IloModel &model, IloNumVarArray &x, IloBoolVar &tempBoolVar);
+    void build_initCons(IloModel &model, IloNumVarArray &x);
     
     void output(IloCplex &cplex, IloNumVarArray &x, MisdpTuneParameters &tune );
-
     
-    void readdata(string filename="/Users/Qi/Dropbox/research/mywork/MISDP-solver/misdp/misdp/data/data.txt");
+//    void readdata(string filename="/Users/Qi/Dropbox/research/mywork/MISDP-solver/misdp/misdp/data/data_dim50.txt");
+    void readdata(string filename="/Users/Qi/Dropbox/research/mywork/MISDP-solver/misdp/misdp/data/data_dim5.txt");
+//    void readdata(string filename="/Users/Qi/Dropbox/research/mywork/MISDP-solver/misdp/misdp/data/data_dim10.txt");
 
 };
 

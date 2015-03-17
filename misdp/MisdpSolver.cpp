@@ -7,282 +7,286 @@
 //
 #define title_everywhere 1
 #define info_level1 1
+#define test_input 1
+#define test_building 1
+#define test_build_initCons 0
+#define test_lazy1 1
+#define test_lazy2 1
 
 #include "MisdpSolver.h"
+
+
+
+extern "C" {
+    // LU decomoposition of a general matrix
+    void dgetrf_(int* M, int *N, double* A, int* lda, int* IPIV, int* INFO);
+    
+    //Computes the inverse of a triangular matrix.
+    void dtrtri_(char *uplo, char*diag, int *n, double *a, int *lda, int *info);
+    
+    // generate inverse of a matrix given its LU decomposition
+    void dgetri_(int* N, double* A, int* lda, int* IPIV, double* WORK, int* lwork, int* INFO);
+    //    void dsyev( char* jobz, char* uplo, int* n, double* a, int* lda, double* w, double* work, int* lwork, int* info );
+    
+    
+    //    void dpotrs_(char* UPLOp, long* Np, long* NRHSp, double* A, long* LDAp, double* B, long* LDBp, long* infop);
+    void dpotrs_(char* UPLOp, int* Np, int* NRHSp, double* A, int* LDAp, double* B, int* LDBp, int* infop);
+    //Computes the Cholesky factorization of a symmetric positive definite matrix.
+    void dpotrf_(char *uplo, int *n, double *a, int *lda, int *info);
+    void dpotri_(char *uplo, int *n, double *a, int *lda, int *info);
+    
+    /* DSYEVX prototype */
+    extern void dsyevx( char* jobz, char* range, char* uplo, int* n, double* a,
+                       int* lda, double* vl, double* vu, int* il, int* iu, double* abstol,
+                       int* m, double* w, double* z, int* ldz, double* work, int* lwork,
+                       int* iwork, int* ifail, int* info );
+    /* Auxiliary routines prototypes */
+    extern void print_matrix( char* desc, int m, int n, double* a, int lda );
+
+}
+
+
 /*
      min  <C_0, X>
      s.t. <A_i, X> \geq b_i, i = 1...m
           X >= 0
  */
-ILOUSERCUTCALLBACK3(myUser, IloNumVarArray,x, MisdpModel &,misdpmodel, MisdpTuneParameters &, tune)
+
+
+ILOLAZYCONSTRAINTCALLBACK3(myLazy, IloNumVarArray,x, MisdpModel &,misdpmodel, MisdpTuneParameters &, tune)
 {
     //    if (getNnodes64() > 10)
     //        return;
 #if title_everywhere
-    cout << " ILOUSERCUTCALLBACK3 tag (fq34345wgw345) " << endl;
+    cout << " ILOLAZYCONSTRAINTCALLBACK3 tag (fq34345wgw345) " << endl;
 #endif
     
-    if (getNnodes64() <= 1){
+    if (getNnodes64() == 0){
         tune.rootBestValue = getBestObjValue();
     };
+    
+    // want to find negative eigen-value (vector) of X = [x]
+    
+    IloEnv env = getEnv();
+    IloNumArray valx_ilo(env);
+    try{
+#if test_lazy2
+        double currObjValue = getObjValue();
+        cout << " currObjValue = " << currObjValue << endl;
+#endif
+        getValues( valx_ilo, x );
+        int n = misdpmodel.n;
+
+        
+        vector<double> valx(n*n);
+        for (int i = 0; i < n*n; i++) {
+            valx[i] = valx_ilo[i];
+        }
+
+        //    #define N 5
+        //    #define NSELECT 2
+        //    #define LDA N
+        //    #define LDZ N
+        //    int N = 5;
+        //    int NSELECT = 3;
+        //    int LDA, LDZ;
+        //    LDA = N; LDZ = N;
+        //
+        
+        /* Main program */
+        /* Locals */
+        int nSelect = n;
+        
+        //    int n = N, il, iu, m, lda = LDA, ldz = LDZ, info, lwork;
+        int il, iu, m, lda = n, ldz = n, info, lwork;
+        double abstol, vl, vu;
+        double wkopt;
+        double* work;
+        /* Local arrays */
+        /* iwork dimension should be at least 5*n */
+        //    int iwork[5*N], ifail[N];
+        vector<int> iwork(5*n, 0);
+        vector<int> ifail(n, 0);
+        //    double w[N], z[LDZ*NSELECT];
+        vector<double> w(n,0);
+        vector<double> z(ldz*nSelect, 0);
+        //    double a[LDA*N] = {
+        //        6.29,  0.00,  0.00,  0.00,  0.00,
+        //        -0.39,  7.19,  0.00,  0.00,  0.00,
+        //        0.61,  0.81,  5.48,  0.00,  0.00,
+        //        1.18,  1.19, -3.13,  3.79,  0.00,
+        //        -0.08, -0.08,  0.22, -0.26,  0.83
+        //    };
+        //        vector<double> a(n*n, 0);
+        //        a  --> & valx[0]
+        
+        /* Executable statements */
+        if (n < 10)
+            printf( " DSYEVX Example Program Results\n" );
+        
+        /* Print original matrix */
+        if (n < 10){
+            cout << valx_ilo << endl;
+            print_matrix( "original matrix (before)", n, n, &valx[0], n );
+        }
+
+        
+        /* Negative abstol means using the default value */
+        abstol = -1.0;
+        /* Set il, iu to compute NSELECT smallest eigenvalues */
+        il = 1;
+        iu = nSelect;
+        /* Query and allocate the optimal workspace */
+        lwork = -1;
+        dsyevx( "Vectors", "Indices", "Upper", &n, &valx[0], &lda, &vl, &vu, &il, &iu,
+               &abstol, &m, &w[0], &z[0], &ldz, &wkopt, &lwork, &iwork[0], &ifail[0], &info );
+        lwork = (int)wkopt;
+        work = (double*)malloc( lwork*sizeof(double) );
+        /* Solve eigenproblem */
+        dsyevx( "Vectors", "Indices", "Upper", &n, &valx[0], &lda, &vl, &vu, &il, &iu,
+               &abstol, &m, &w[0], &z[0], &ldz, &work[0], &lwork, &iwork[0], &ifail[0], &info );
+        /* Check for convergence */
+        if( info > 0 ) {
+            printf( "The algorithm failed to compute eigenvalues.\n" );
+            exit( 1 );
+        }
+        /* Print the number of eigenvalues found */
+        printf( "\n The total number of eigenvalues found:%2i\n", m );
+        /* Print original matrix */
+        if (n < 10){
+            cout << valx_ilo << endl;
+            print_matrix( "original matrix (after)", n, n, &valx[0], n );
+        }
+        /* Print eigenvalues */
+        print_matrix( "Selected eigenvalues", 1, m, &w[0], 1 );
+        /* Print eigenvectors */
+        if (n < 10)
+            print_matrix( "Selected eigenvectors (stored columnwise)", n, m, &z[0], ldz );
+        /* Free workspace */
+//        free( (void*)work );
+        
+        
+        
+#if test_lazy1
+        cout << " ready to build cuts2BeAdded (tag of9wj90)" << endl;
+#endif
+        
+        IloConstraintArray cuts2BeAdded(env);
+        nSelect = 1;
+        for (int iEigen = 0; iEigen < nSelect; iEigen++){
+            if (w[iEigen] < -1e-2) {
+#if test_lazy2
+                cout << " iEigen = " << iEigen;
+                cout << ", w[iEigen] = " << w[iEigen] ;
+                cout << ". z[iEigen] = " << endl << "[";
+                for (int i = 0; i < n; i++) {
+                    cout << z[i+iEigen*n] << ", " ;
+                }
+                cout  << "]" << endl;
+#endif
+                
+                
+                IloExpr lhs(env);
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+#if 0 & test_lazy1
+//                        cout << " lhs = " << lhs << endl;
+                        IloExpr temp(env);
+                        temp = z[j+iEigen*n] * z[i+iEigen*n] * x[i*n+j];
+                        cout << " temp = " << temp << endl;
+#endif
+                        lhs += n  *  z[j+iEigen*n] * z[i+iEigen*n] * x[i*n+j];
+                    }
+                }
+//                IloExpr lhs(env);
+//                for (int i = 0; i < n; i++) {
+//                    for (int j = 0; j < n; j++) {
+//#if 0 & test_lazy1
+//                        //                        cout << " lhs = " << lhs << endl;
+//                        IloExpr temp(env);
+//                        temp = z[j+iEigen*n] * z[i+iEigen*n] * x[i*n+j];
+//                        cout << " temp = " << temp << endl;
+//#endif
+//                        if ( i == j )
+//                            lhs += n * z[j+iEigen*n] * z[i+iEigen*n] * x[i*n+j];
+//                        else if (i > j)
+//                            lhs += 2 * n * z[j+iEigen*n] * z[i+iEigen*n] * x[i*n+j];
+//                    }
+//                }
+
+                IloRange cut;
+                cut = ( lhs >= 1e-4 );
+#if test_lazy1
+                if (n < 100)
+                    cout << " cut = " << cut << endl;
+#endif
+                cuts2BeAdded.add( cut );
+                tune.num_tangentcut ++ ;
+            }
+        }
+        
+#if test_lazy1
+        cout << " ready to add cuts. " << "cuts2BeAdded.getSize() = " << cuts2BeAdded.getSize() << " (tag g3qw5gfq34fq432)" << endl;
+#endif
+        for (int i = 0; i < cuts2BeAdded.getSize(); i++){
+            add( cuts2BeAdded[i] ).end();
+        }
+#if test_lazy1
+        cout << " finished adding cuts (tag g3qw5gfq34fq432)" << endl;
+#endif
+
+        
+        valx_ilo.end();
+        cuts2BeAdded.end();
+
+#if test_lazy2
+        cout << " currObjValue = " << currObjValue << endl;
+#endif
+        
+#if title_everywhere
+        cout << " end of user cut callback " << endl;
+        cout << " - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - -" << endl;
+        cout << "\n\n\n" << endl;
+        {
+            int temp;
+            cin >> temp;
+        }
+#endif
+
+        //        exit( 0 );
+        
+    } catch (...) {
+        valx_ilo.end();
+        //        for (int i = 0; i < cuts2BeAddedOnU.getSize(); i++)
+        //            cuts2BeAddedOnU[i].end();
+        //        for (int i = 0; i < cuts2BeAddedOnL.getSize(); i++)
+        //            cuts2BeAddedOnL[i].end();
+        //        for (int i = 0; i < cuts2BeAddedOnLandU.getSize(); i++)
+        //            cuts2BeAddedOnLandU[i].end();
+        //
+        //        cuts2BeAddedOnL.end();
+        //        cuts2BeAddedOnLandU.end();
+        //        cuts2BeAddedOnU.end();
+        throw;
+    }
+    //#if debugMode_display_cut_info_summary
+    //    {
+    //        cout << "  end of user cut round jwaoejfaw9jfaw4" << endl ;
+    //    }
+    //#endif
+    //
+    //#if debugMode_display_pause || debugMode_usercut
+    //    {
+    //        cout << " - at the end of user cut callback" << endl ;
+    //        cout << " - type something here: ( 45hn667rhe )" << endl;
+    //        int temp;
+    //        cin >> temp;
+    //    }
+    //#endif
+    
+    
+    
 }
-
-
-//
-//    
-//    
-//    
-//    tune.any_cut_added = false;
-//    tune.num_cut_added_this_round = 0;
-//    tune.cumulative_violated_amount = 0;
-//    
-//#if debugMode_positionTitle
-//    cout << " \n * * \n * * user cut callback: upper gradient + lower facet (tag f234v57henu68r)  " << endl;
-//#endif
-//    
-//#if debugMode_display_callback_info
-//    cout << "  getNnodes64 = " << getNnodes64() << ", getNremainingNodes64 = " << getNremainingNodes64() << endl;
-//#endif
-//    IloEnv env = getEnv();
-//    IloNumArray valz(env);
-//    IloNum valf = 0;
-//    IloNum valg = 0;
-//    IloNum valmse = 0;
-//    
-//    
-//    IloConstraintArray cuts2BeAddedOnU(env);
-//    IloConstraintArray cuts2BeAddedOnL(env);
-//    IloConstraintArray cuts2BeAddedOnLandU(env);
-//    
-//    
-//    try {
-//        // now we may have a integer feasible solution
-//        valz  = IloNumArray(env);
-//        valf  = getValue( f );
-//        valg  = getValue( g );
-//        getValues( valz, z );
-//        valmse  = getValue( mse );
-//        
-//        int n = data.getCols();
-//        
-//        
-//#if debugMode_display_callback_sol
-//        cout << " valz = " << valz;
-//        cout << ", valf = " << valf;
-//        cout << ", valg = " << valg << endl;
-//#endif
-//        double distFromLastValz = 0;
-//        for (int i = 0; i < n ; i++){
-//            distFromLastValz += pow(lastValz[i] - valz[i], 2);
-//        }
-//        distFromLastValz = sqrt(distFromLastValz);
-//#if debugMode_display_callback_sol
-//        cout << " lastValz = [ " ;
-//        for (int i = 0; i < n; i++)
-//            cout << lastValz[i] << ", " ;
-//        cout << "]  distFromLastValz = " << distFromLastValz << endl;
-//#endif
-//        if (distFromLastValz < .01*n)
-//            return;
-//        
-//        
-//        
-//        
-//        bitset<_CONST_INT_MAX_FACTOR_SIZE> currentSelection;
-//        //        bitset<_CONST_INT_MAX_FACTOR_SIZE> currentNode;
-//        for (int j = 0; j < n; j++)
-//            if ( valz[j] > 0.5 )
-//                currentSelection.set(j);
-//#if debugMode_display_sol // debugMode_display_sol
-//        cout << "    sol information (tag fq4293jfq3400): " << endl;
-//        cout << ",   currentSelection = " << currentSelection << endl;
-//        cout << "    valf = " << valf << ", data.logDetSubmatrix(currentSelection) = " << data.logDetSubmatrix(currentSelection) << endl;
-//        cout << "    valg = " << valg << ", data.logDetSubmatrix_with_y(currentSelection) = " << data.logDetSubmatrix_with_y(currentSelection) << endl;
-//#endif
-//        
-//        
-//        
-//#if debugMode_usercut && 0
-//        {
-//            cout << " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - " << endl ;
-//            cout << " - - - - - a new label to test when to add user gradient cut" << endl<< endl<< endl ;
-//            
-//            cout << " f.getUB() = " << f.getUB() ;
-//            cout << ",  f.getLB() = " << f.getLB() << endl;
-//            
-//            double c = data.logDet_IplusDiagzW( valz ) ;
-//            cout << " c = " << c << ", f = " << valf << endl << endl;
-//            
-//            int temp;
-//            cin >> temp;
-//        }
-//#endif
-//        
-//        // test
-//        cout << " valz = " <<  valz << endl;
-//        //
-//        if  ( tune.cutTypeFlag_User_adaptive_NSD ) {
-//            cout << " apply generateCuts_total_gradient_adaptive_nsd (user, tag fq4brste4wafers) \n";
-//            SparseRegressionProblem :: generateCuts_total_gradient_adaptive_nsd(env, cuts2BeAddedOnLandU, data, tune, z, f, g, valz, valf, valg, getNnodes(), lastValz);
-//            cout << " end generateCuts_total_gradient_adaptive_nsd (user, tag fa3w4egvrv545dt) \n";
-//        }
-//        
-//        if  ( tune.cutTypeFlag_User_NSD ) {
-//            cout << " apply generateCuts_total_gradient_nsd (user, tag fawfeawfaewfaw ) \n";
-//            SparseRegressionProblem :: generateCuts_total_gradient_nsd(env, cuts2BeAddedOnLandU, data, tune, z, f, g, valz, valf, valg, getNnodes(), lastValz);
-//        }
-//        
-//        
-//        
-//        if  ( tune.cutTypeFlag_User_adaptive_PSD ) {
-//            cout << " apply generateCuts_total_gradient_adaptive_psd (user, tag fawrbs5enhdr6n) \n";
-//            SparseRegressionProblem :: generateCuts_total_gradient_adaptive_psd(env, cuts2BeAddedOnLandU, data, tune, z, f, g, valz, valf, valg, getNnodes(), lastValz);
-//            cout << " end generateCuts_total_gradient_adaptive_psd (user, tag fzsebfdr6m7) \n";
-//        }
-//        
-//        
-//        if  ( tune.cutTypeFlag_User_PSD ) {
-//            cout << " apply generateCuts_total_gradient_psd (user, tag fawefawfawgae) \n";
-//            SparseRegressionProblem :: generateCuts_total_gradient_psd(env, cuts2BeAddedOnLandU, data, tune, z, f, g, valz, valf, valg, getNnodes(), lastValz);
-//        }
-//        
-//        
-//        
-//        //        double c = data.logDet_IplusDiagzW( valz ) ;
-//        
-//        
-//        if (tune.cutTypeFlag_User_uppergradient_eig1) {
-//            cout << " apply generateCuts_uppercuts_maxEig1_gradient (user, tag 2039f203j) \n";
-//            SparseRegressionProblem :: generateCuts_uppercuts_maxEig1_gradient(env, cuts2BeAddedOnU, data, tune, z, f, valz, valf);
-//        }
-//        
-//        
-//        
-//        // upper gradient
-//        //        if ( ( tune.cutTypeFlag_User_uppergradient )
-//        //                && ( valf > c + tune.DOUBLE_EPSILON_ADD_USER_CUT_THRESHOLD ) ) {
-//        if (  tune.cutTypeFlag_User_uppergradient  ) {
-//            cout << " apply generateCuts_uppercuts_gradient (user, tag 2309r23jjf2) \n";
-//            SparseRegressionProblem :: generateCuts_uppercuts_gradient(env, cuts2BeAddedOnU, data, tune, z, f, valz, valf);
-//        }
-//        
-//        
-//        
-//        
-//        // lower facet
-//        if ( (tune.cutTypeFlag_User_lowerfacet) ){
-//            cout << " apply generateCuts_lowercuts (user) \n";
-//            SparseRegressionProblem :: generateCuts_lowercuts(env, cuts2BeAddedOnL, data, tune, z, g, valz, valg);
-//        }
-//        
-//        // exp grad
-//        if (1 && (tune.kSparse >= 0)){
-//            cout << " apply generateCuts_exp_gradient (user) \n";
-//            SparseRegressionProblem :: generateCuts_exp_gradient(env, cuts2BeAddedOnLandU, tune, mse, valmse, f, valf, g, valg);
-//            cout << " end generateCuts_exp_gradient (user) \n";
-//        }
-//        
-//        if  ( 0 ) {
-//            cout << " apply generateCuts_partial_r_gradient (user) \n";
-//            SparseRegressionProblem :: generateCuts_partial_r_gradient(env, cuts2BeAddedOnLandU, data, tune, z, f, g, valz, valf, valg, getNnodes(), lastValz);
-//        }
-//        
-//        
-//        
-//        
-//#if debugMode_display_cut_info_summary
-//        cout << " number of cuts added in this round of USER on f = " << cuts2BeAddedOnU.getSize() << endl;
-//        cout << " number of cuts added in this round of USER on g = " << cuts2BeAddedOnL.getSize() << endl;
-//        cout << " number of cuts added in this round of USER on f-g = " << cuts2BeAddedOnLandU.getSize() << endl;
-//#endif
-//        
-//        for (int i = 0; i < cuts2BeAddedOnU.getSize(); i++){
-//#if debugMode_display_cut_info_summary
-//            cout << " in cuts2BeAddedOnU loop, i = " << i << endl;
-//#endif
-//            if (n < 5)
-//                cout << cuts2BeAddedOnU[i] << endl;
-//            
-//            add( cuts2BeAddedOnU[i] ).end();
-//            tune.num_user_cut++;
-//            tune.num_user_cut_on_f++;
-//        }
-//        
-//        for (int i = 0; i < cuts2BeAddedOnL.getSize(); i++){
-//#if debugMode_display_cut_info_summary
-//            cout << " in cuts2BeAddedOnL loop, i = " << i << endl;
-//#endif
-//            if (n < 5)
-//                cout << cuts2BeAddedOnL[i] << endl;
-//            
-//            add( cuts2BeAddedOnL[i] ).end();
-//            tune.num_user_cut++;
-//            tune.num_user_cut_on_g++;
-//        }
-//        for (int i = 0; i < cuts2BeAddedOnLandU.getSize(); i++){
-//#if debugMode_display_cut_info_summary
-//            cout << " in cuts2BeAddedOnLandU loop, i = " << i << endl;
-//#endif
-//            if (n < 5)
-//                cout << cuts2BeAddedOnLandU[i] << endl;
-//            
-//            add( cuts2BeAddedOnLandU[i] ).end();
-//            tune.num_user_cut++;
-//            tune.num_user_cut_on_fandg++;
-//        }
-//        
-//#if debugMode_display_pause || debugMode_usercut
-//        cout << " valz = " << valz;
-//        cout << ", valf = " << valf;
-//        cout << ", valg = " << valg << endl;
-//#endif
-//        
-//        
-//        
-//        for (int i = 0; i < n ; i++)
-//            lastValz[i] = valz[i];
-//        
-//        valz.end();
-//        cuts2BeAddedOnL.end();
-//        cuts2BeAddedOnLandU.end();
-//        cuts2BeAddedOnU.end();
-//        
-//    } catch (...) {
-//        valz.end();
-//        for (int i = 0; i < cuts2BeAddedOnU.getSize(); i++)
-//            cuts2BeAddedOnU[i].end();
-//        for (int i = 0; i < cuts2BeAddedOnL.getSize(); i++)
-//            cuts2BeAddedOnL[i].end();
-//        for (int i = 0; i < cuts2BeAddedOnLandU.getSize(); i++)
-//            cuts2BeAddedOnLandU[i].end();
-//        
-//        cuts2BeAddedOnL.end();
-//        cuts2BeAddedOnLandU.end();
-//        cuts2BeAddedOnU.end();
-//        throw;
-//        
-//    }
-//#if debugMode_display_cut_info_summary
-//    {
-//        cout << "  end of user cut round jwaoejfaw9jfaw4" << endl ;
-//    }
-//#endif
-//    
-//#if debugMode_display_pause || debugMode_usercut
-//    {
-//        cout << " - at the end of user cut callback" << endl ;
-//        cout << " - type something here: ( 45hn667rhe )" << endl;
-//        int temp;
-//        cin >> temp;
-//    }
-//#endif
-//    
-//    
-//};
-
-
-
-
 
 void MisdpSolver::solve () {
     int n = misdpmodel.n;
@@ -294,9 +298,22 @@ void MisdpSolver::solve () {
     try{
         IloModel        model(env);
         IloCplex        cplex(env);
-        IloNumVarArray x(env=env, n=n*n);                    // x[i][j] = x[j*n+i]
+
+        IloNumVarArray x(env, n*n, -IloInfinity, IloInfinity);
+//        IloNumVarArray x(env, n*n);
+                // x[i][j] = x[j*n+i]
+        IloBoolVar tempBoolVar(env);
         
-        cplex.use( myUser( env, x, misdpmodel, tune) );
+        namingVar(model, x);
+        
+        build(model, x, tempBoolVar);
+        
+//        cplex.use( myUser( env, x, misdpmodel, tune) );
+        cplex.use( myLazy( env, x, misdpmodel, tune) );
+//        cplex.use( myIncumbent( env, x, misdpmodel, tune) );
+//        cplex.use( mySimplex( env, x, misdpmodel, tune) );
+//        cplex.use( myMipinfo( env, x, misdpmodel, tune) );
+//        cplex.use( myCallback( env, x, misdpmodel, tune) );
 
         /*
          ########     ###    ########     ###    ##     ##
@@ -334,7 +351,7 @@ void MisdpSolver::solve () {
         //        cplex.setParam(IloCplex::EpMrk, 1e-6);
         //        cplex.setParam(IloCplex::Ep, 1e-6);
         
-        //        cplex.setParam(IloCplex::PreInd, 0);
+                cplex.setParam(IloCplex::PreInd, 0);
         // cplex.setParam(IloCplex::MIPEmphasis, 1);
         // this is for cplex 12.6
         //        cplex.setParam(IloCplex::Param::MIP::Cuts::Gomory, -1);
@@ -345,6 +362,20 @@ void MisdpSolver::solve () {
         cplex.exportModel ("model1.lp");
 #if title_everywhere
         cout << " ready to solve tag (fawefawefaw) " << endl;
+#endif
+        
+        
+        
+#if 1
+        cout << " * * * * * * * * * * * * * * * * * * * * * * * * * * * *  " << endl;
+        cout << "\n\n\n" << endl;
+        cout << " ready to solve cplex " << endl;
+        cout << "\n\n\n" << endl;
+        cout << " * * * * * * * * * * * * * * * * * * * * * * * * * * * *  " << endl;
+        {
+            int temp;
+            cin >> temp;
+        }
 #endif
 
         cplex.solve();
@@ -379,7 +410,16 @@ void MisdpSolver::output(IloCplex &cplex, IloNumVarArray &x, MisdpTuneParameters
     env.out() << "Solution status = " << cplex.getStatus() << endl;
     env.out() << "Solution value  = " << cplex.getObjValue() << endl;
     env.out() << "# nodes = " << cplex.getNnodes64() << endl;
-    env.out() << "val.x  = " << valx << endl;
+//    env.out() << "val.x  = " << valx << endl;
+    env.out() << "tune.num_tangentcut = " << tune.num_tangentcut << endl;
+    
+    int n = misdpmodel.n;
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            cout << valx[i * n + j] << ", ";
+        }
+        cout << endl;
+    }
 
 
 }
@@ -395,25 +435,94 @@ void MisdpSolver::readdata(string filename) {
 }
 
 
-void MisdpSolver::build (IloModel &model, IloBoolVarArray &x) {
-    build_obj(model, x);
+
+void MisdpSolver :: namingVar (IloModel &model, IloNumVarArray &x)
+{
+#if title_everywhere
+    cout << " MisdpSolver :: namingVar tag (f23f23gq2) \n\n\n " << endl;
+#endif
+    int n = misdpmodel.n;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            string name = "x_";
+            name += to_string( i+1 );
+            name += "_";
+            name += to_string( j+1 );
+            x[i*n+j].setName(name.c_str());
+#if test_building
+            cout << name.c_str() << endl;
+#endif
+        }
+    }
+//    
+//    for (int i = 0; i < n*n; i++) {
+//        string name = "x";
+//        name += to_string( i+1 );
+//        x[i].setName(name.c_str());
+//#if test_building
+//        cout << x[i] << endl;
+//        cout << name.c_str() << endl;
+//#endif
+//    };
+
+};
+
+
+
+
+void MisdpSolver::build (IloModel &model, IloNumVarArray &x, IloBoolVar &tempBoolVar) {
+    build_obj(model, x, tempBoolVar);
     build_initCons(model, x);
 }
 
 
 
-void MisdpSolver::build_obj (IloModel &model, IloBoolVarArray &x) {
+void MisdpSolver::build_obj (IloModel &model, IloNumVarArray &x, IloBoolVar &tempBoolVar)
+{
 #if title_everywhere
-    cout << " MisdpSolver::build_obj tag (fq34gw3q) " << endl;
+    cout << " MisdpSolver::build_obj tag (f24wfwaf) " << endl;
 #endif
-    IloNumExpr exprObj(env);
-    for (int i = 0; i < misdpmodel.obj.coefficients.size(); i++)
+    IloExpr exprObj(env);
+#if test_building
+    cout << "obj = " << " (size)=" << misdpmodel.obj.coefficients.size()<<endl;
+#endif
+
+    for (int i = 0; i < misdpmodel.obj.coefficients.size(); i++){
+#if test_building
+        cout << " (" << misdpmodel.obj.coefficients[i] << ") , "   ;
+        cout << x[i] << ", "  ;
+//        cout << misdpmodel.obj.coefficients[i]* x[i] << ", " << endl  ;
+//        cout << exprObj << ", " << endl  ;
+#endif
+        
         exprObj += misdpmodel.obj.coefficients[i] * x[i];
+#if test_building
+        if ( misdpmodel.obj.coefficients.size() < 2 )
+            cout << exprObj << ", " << endl ;
+#endif
+    }
+#if test_building
+    cout  <<endl;
+#endif
+
+    exprObj += tempBoolVar;
+#if test_building
+    if (x.getSize() < 100)
+        cout  << " exprObj = " << exprObj << endl;;
+#endif
     
     model.add(IloMinimize(env, exprObj));
+#if test_building
+    cout  << " \n \n \n * * * * * * * * * \n \n \n exprObj = " << exprObj << endl;;
+    {
+        int temp;
+        cin >> temp;
+    }
+#endif
+
 }
 
-void MisdpSolver::build_initCons (IloModel &model, IloBoolVarArray &x) {
+void MisdpSolver::build_initCons (IloModel &model, IloNumVarArray &x) {
 #if title_everywhere
     cout << " MisdpSolver::build_initCons tag (fq234f34gw35) " << endl;
 #endif
@@ -421,19 +530,83 @@ void MisdpSolver::build_initCons (IloModel &model, IloBoolVarArray &x) {
     // symmetric
     for (int i = 0; i < n; i++ ) {
         for (int j = 0; j < n; j++ ) {
-            if (i != j)
+            if (i >= j)
                 model.add( x[i*n+j] == x[j*n+i] );
         }
     }
     
+#if test_build_initCons
+    cout << " MisdpSolver::build_initCons tag (fwrges5hw54) " << endl;
+#endif
+    // non-negative diagonal
+    for (int i = 0; i < n; i++) {
+        x[i*n+i].setBounds(0, IloInfinity);
+    }
+#if test_build_initCons
+    cout << " MisdpSolver::build_initCons tag (h54h45whw35) " << endl;
+#endif
+
+    // initial cons in misdpmodel
+    for (int iCons =0; iCons < misdpmodel.m; iCons++) {
+        IloExpr lhs(env);
+#if test_build_initCons
+        cout << " MisdpSolver::build_initCons tag (he56j6e545w) " << endl;
+        cout << " misdpmodel.m = " << misdpmodel.m << endl;
+#endif
+        for (int iCoeff = 0; iCoeff < n*n; iCoeff++) {
+#if 0 &  test_build_initCons
+            cout << "misdpmodel.cons[iCons].coefficients.size() = " << misdpmodel.cons[iCons].coefficients.size() << endl;
+//            cout << "misdpmodel.cons[iCons].coefficients[iCoeff] = " << misdpmodel.cons[iCons].coefficients[iCoeff] << endl;
+//            cout << "misdpmodel.cons[iCons].coefficients[1] = " << misdpmodel.cons[iCons].coefficients[1] << endl;
+//            cout << "misdpmodel.cons[iCons].coefficients[2] = " << misdpmodel.cons[iCons].coefficients[2] << endl;
+            cout << "x[iCoeff] = " << x[iCoeff] << endl;
+//            cout << "x[1] = " << x[1] << endl;
+//            cout << "x[2] = " << x[2] << endl;
+#endif
+            lhs += misdpmodel.cons[iCons].coefficients[iCoeff] * x[iCoeff];
+#if test_build_initCons
+            cout << "x[iCoeff] = " << x[iCoeff] << endl;
+#endif
+        }
+        double rhs = misdpmodel.cons[iCons].rhs;
+#if test_build_initCons
+        cout << " MisdpSolver::build_initCons tag (h56he4hw45) " << endl;
+#endif
+
+        switch (misdpmodel.cons[iCons].sign) {
+//            case '>':
+            case 'g':
+                model.add(lhs >= rhs);
+                break;
+//            case '<':
+            case 'l':
+                model.add(lhs <= rhs);
+                break;
+//            case '=':
+            case 'e':
+                model.add(lhs == rhs);
+                break;
+        }
+#if test_build_initCons
+        cout << " MisdpSolver::build_initCons tag (gw35g56jr57) " << endl;
+#endif
+
+    }
+#if test_build_initCons
+    cout << " MisdpSolver::build_initCons tag (k86r7je5f34f) " << endl;
+#endif
+
     // 2-dim submatrix
     for (int i = 0; i < n; i++ ) {
-        for (int j = 0; j < n; j++ ) {
+        for (int j = i+1; j < n; j++ ) {
             if (i != j){
-                model.add( x[i*n+i] >= x[j*n+i] );
-                model.add( x[i*n+i] >= -x[j*n+i] );
+                model.add( x[i*n+i] + x[j*n+j] >= 2 * x[j*n+i] );
+                model.add( x[i*n+i] + x[j*n+j] >= - 2 * x[j*n+i] );
             }
         }
     }
+    
+    
+    
     
 }

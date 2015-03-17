@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Qi Zhang. All rights reserved.
 //
 
+#define test_input 1
 #include "MisdpModel.h"
 
 void MisdpModel :: readdata( string filename )
@@ -37,6 +38,9 @@ void MisdpModel :: readdata( string filename )
             cin >> temp;
         }
         iss >> n;
+#if test_input
+        cout << "n = " << n << endl;
+#endif
     }
     
     getline(f, line); // expect "coef of obj", n*n numbers
@@ -44,12 +48,21 @@ void MisdpModel :: readdata( string filename )
         istringstream iss(line);
         vector< double > objCoef;
         double currCoef;
+#if test_input
+        cout << "coef = " << endl;
+#endif
         for (int i = 0; i < n*n; i++) {
             iss >> currCoef;
             objCoef.push_back(currCoef);
+#if test_input
+            cout << currCoef << "\t"  ;
+#endif
         }
         obj.setCoefficients(objCoef);
     }
+#if test_input
+    cout  << endl;
+#endif
 
     getline(f, line); // expect "cons, m"
     {
@@ -64,6 +77,9 @@ void MisdpModel :: readdata( string filename )
             cin >> temp;
         }
         iss >> m;
+#if test_input
+        cout << "m = " << m << endl;
+#endif
     }
     for (int iCons = 0; iCons < m; iCons++) {
         Constraint con;
@@ -72,12 +88,21 @@ void MisdpModel :: readdata( string filename )
         vector< double > conCoef;
         double currCoef;
         istringstream iss(line);
+#if test_input
+        cout << "coef = " << endl;
+#endif
         for (int i = 0; i < n*n; i++) {
             iss >> currCoef;
             conCoef.push_back(currCoef);
+#if test_input
+            cout << currCoef << ", "  ;
+#endif
         }
         con.setCoefficients(conCoef);
-        
+#if test_input
+        cout  << endl;
+#endif
+
         getline(f, line); // one line of constraints sign, rhs, expect "< rhs"
         istringstream iss2(line);
         char sign;
@@ -85,8 +110,9 @@ void MisdpModel :: readdata( string filename )
         iss2 >> sign >> rhs;
         con.setRhs(rhs);
         con.setSign(sign);
+        
+        cons.push_back(con);
     }
-    
 };
 
 
@@ -123,6 +149,15 @@ void MisdpModel :: readdata( string filename )
 void Expression::setCoefficients(const vector<double> & coef)
 {
     coefficients = coef;
+#if test_input
+    cout << "\nin Expression::setCoefficients. (tag fawoiefjoaw) coefficients = " << endl;
+#endif
+    for (int i = 0; i < coefficients.size(); i++) {
+#if test_input
+        cout << coefficients[i] << ", "  ;
+#endif
+    }
+
 };
 
 void Constraint::setSign(char s)

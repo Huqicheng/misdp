@@ -11,5 +11,8 @@
 
 MisdpTuneParameters::MisdpTuneParameters() {
     if_true = true;
+    
+    
+    num_tangentcut = 0;
 }
 

@@ -22,12 +22,15 @@ class Rectangle {
     bool if_modelInputed;
     
     IloEnv env;
+    
 
     
 public:
     Rectangle ();
     Rectangle (int,int);
     int area (void) {return (width*height);}
+
+    void test_LAPACK();
 };
 
 #endif /* defined(__misdp__Rectangle__) */

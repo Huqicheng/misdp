@@ -1,0 +1,174 @@
+$(inherited)
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+
+
+
+
+//
+//ILOINCUMBENTCALLBACK3(myIncumbent, IloNumVarArray,x, MisdpModel &,misdpmodel, MisdpTuneParameters &, tune)
+//{
+//#if title_everywhere
+//    cout << " ILOINCUMBENTCALLBACK3 tag (he46h45shgs45wuy567u) " << endl;
+//#endif
+//
+//}
+//
+//ILOSIMPLEXCALLBACK3(mySimplex, IloNumVarArray,x, MisdpModel &,misdpmodel, MisdpTuneParameters &, tune)
+//{
+//#if title_everywhere
+//    cout << " ILOSIMPLEXCALLBACK3 tag (gw3gw34q34tq34) " << endl;
+//#endif
+//
+//}
+//
+//ILOMIPINFOCALLBACK3(myMipinfo, IloNumVarArray,x, MisdpModel &,misdpmodel, MisdpTuneParameters &, tune)
+//{
+//#if title_everywhere
+//    cout << " ILOMIPINFOCALLBACK3 tag (g3wgq34q3443tq) " << endl;
+//#endif
+//
+//}
+//
+//ILOCONTINUOUSCALLBACK3(myCallback, IloNumVarArray,x, MisdpModel &,misdpmodel, MisdpTuneParameters &, tune)
+//{
+//#if title_everywhere
+//    cout << " ILOCONTINUOUSCALLBACK3 tag (gq34g34gw45wy45) " << endl;
+//#endif
+//
+//}
+//
+
+
+
+ILOUSERCUTCALLBACK3(myUser, IloNumVarArray,x, MisdpModel &,misdpmodel, MisdpTuneParameters &, tune)
+{
+//    if (getNnodes64() > 10)
+//        return;
+#if title_everywhere
+cout << " ILOUSERCUTCALLBACK3 tag (fq34345wgw345) " << endl;
+#endif
+
+if (getNnodes64() == 0){
+tune.rootBestValue = getBestObjValue();
+};
+
+
+// want to find negative eigen-value (vector) of X = [x]
+
+
+
+IloEnv env = getEnv();
+IloNumArray valx(env);
+try{
+getValues( valx, x );
+//    #define N 5
+//    #define NSELECT 2
+//    #define LDA N
+//    #define LDZ N
+//    int N = 5;
+//    int NSELECT = 3;
+//    int LDA, LDZ;
+//    LDA = N; LDZ = N;
+//
+
+/* Main program */
+/* Locals */
+int n = misdpmodel.n;
+int nSelect = 2;
+
+//    int n = N, il, iu, m, lda = LDA, ldz = LDZ, info, lwork;
+int il, iu, m, lda = n, ldz = n, info, lwork;
+double abstol, vl, vu;
+double wkopt;
+double* work;
+/* Local arrays */
+/* iwork dimension should be at least 5*n */
+//    int iwork[5*N], ifail[N];
+vector<int> iwork(5*n, 0);
+vector<int> ifail(n, 0);
+//    double w[N], z[LDZ*NSELECT];
+vector<double> w(n,0);
+vector<double> z(ldz*nSelect, 0);
+//    double a[LDA*N] = {
+//        6.29,  0.00,  0.00,  0.00,  0.00,
+//        -0.39,  7.19,  0.00,  0.00,  0.00,
+//        0.61,  0.81,  5.48,  0.00,  0.00,
+//        1.18,  1.19, -3.13,  3.79,  0.00,
+//        -0.08, -0.08,  0.22, -0.26,  0.83
+//    };
+//        vector<double> a(n*n, 0);
+//        a  --> & valx[0]
+
+
+/* Executable statements */
+printf( " DSYEVX Example Program Results\n" );
+/* Negative abstol means using the default value */
+abstol = -1.0;
+/* Set il, iu to compute NSELECT smallest eigenvalues */
+il = 1;
+iu = nSelect;
+/* Query and allocate the optimal workspace */
+lwork = -1;
+dsyevx( "Vectors", "Indices", "Upper", &n, &valx[0], &lda, &vl, &vu, &il, &iu,
+&abstol, &m, &w[0], &z[0], &ldz, &wkopt, &lwork, &iwork[0], &ifail[0], &info );
+lwork = (int)wkopt;
+work = (double*)malloc( lwork*sizeof(double) );
+/* Solve eigenproblem */
+dsyevx( "Vectors", "Indices", "Upper", &n, &valx[0], &lda, &vl, &vu, &il, &iu,
+&abstol, &m, &w[0], &z[0], &ldz, &work[0], &lwork, &iwork[0], &ifail[0], &info );
+/* Check for convergence */
+if( info > 0 ) {
+printf( "The algorithm failed to compute eigenvalues.\n" );
+exit( 1 );
+}
+/* Print the number of eigenvalues found */
+printf( "\n The total number of eigenvalues found:%2i\n", m );
+/* Print eigenvalues */
+print_matrix( "Selected eigenvalues", 1, m, &w[0], 1 );
+/* Print eigenvectors */
+print_matrix( "Selected eigenvectors (stored columnwise)", n, m, &z[0], ldz );
+/* Free workspace */
+free( (void*)work );
+
+
+valx.end();
+
+
+
+//        exit( 0 );
+
+} catch (...) {
+valx.end();
+//        for (int i = 0; i < cuts2BeAddedOnU.getSize(); i++)
+//            cuts2BeAddedOnU[i].end();
+//        for (int i = 0; i < cuts2BeAddedOnL.getSize(); i++)
+//            cuts2BeAddedOnL[i].end();
+//        for (int i = 0; i < cuts2BeAddedOnLandU.getSize(); i++)
+//            cuts2BeAddedOnLandU[i].end();
+//
+//        cuts2BeAddedOnL.end();
+//        cuts2BeAddedOnLandU.end();
+//        cuts2BeAddedOnU.end();
+throw;
+}
+//#if debugMode_display_cut_info_summary
+//    {
+//        cout << "  end of user cut round jwaoejfaw9jfaw4" << endl ;
+//    }
+//#endif
+//
+//#if debugMode_display_pause || debugMode_usercut
+//    {
+//        cout << " - at the end of user cut callback" << endl ;
+//        cout << " - type something here: ( 45hn667rhe )" << endl;
+//        int temp;
+//        cin >> temp;
+//    }
+//#endif
+
+
+
+}
+
+
+

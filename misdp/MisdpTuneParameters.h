@@ -19,6 +19,7 @@ class MisdpTuneParameters{
 public:
     
     double rootBestValue;
+    int num_tangentcut;
 
     MisdpTuneParameters();
     
